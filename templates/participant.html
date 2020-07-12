@@ -1,0 +1,44 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="card mod-card">
+	<div class="card-content">
+		<div class="media">
+			<div class="media-left">
+				<figure class="image is-128x128">
+					<img src="{{ user.avatar }}" alt="Avatar" class="avatar">
+				</figure>
+			</div>
+			<div class="media-content">
+				<p class="title is-4">{{ user.format() }}</p>
+				<p class="subtitle is-6">{% for badge in badges %}<img src="{{ url_for('static', filename='badges/' + badge.file) }}" alt="{{ badge.name }}" title="{{ badge.name }}" class="badge"> {% endfor %}</p>
+			</div>
+		</div>
+	</div>
+</div>
+    <br>
+<div class="container entries-list">
+	{% for entry in entries %}
+	<div class="card mod-card">
+		<div class="card-image">
+			<figure class="image mod-screenshot is-2by1">
+				<img src="{{ entry.screenshot }}" alt="{{ entry.name }}">
+			</figure>
+		</div>
+		<div class="card-content">
+			<div class="media">
+				<div class="media-content">
+					<a href="{{ entry.link}}" target="_blank">
+						<p class="title is-4">{{ entry.name }}</p>
+					</a>
+					<p class="subtitle is-6">by {% for user in entry.users %}{{ user.username }} {% endfor %}</p>
+				</div>
+			</div>
+			<div class="content">
+				{{ entry.description }}
+			</div>
+		</div>
+	</div>
+	{% endfor %}
+</div>
+{% endblock %}

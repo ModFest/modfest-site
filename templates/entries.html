@@ -1,0 +1,35 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<h3>ModFest {{ event.name }} Entries</h3>
+<p>
+	ModFest {{ event.name }} had {{ event.entries_count }} total entries created by over {{ event.modders_count }} total
+	modders.
+</p>
+<div class="container entries-list">
+	{% for entry in entries %}
+	<!-- Start {{ entry.name }} -->
+	<div class="card mod-card">
+		<div class="card-image">
+			<figure class="image mod-screenshot is-2by1">
+				<img src="{{ entry.screenshot }}" alt="{{ entry.name }}">
+			</figure>
+		</div>
+		<div class="card-content">
+			<div class="media">
+				<div class="media-content">
+					<a href="{{ entry.link}}" target="_blank">
+						<p class="title is-4">{{ entry.name }}</p>
+					</a>
+					<p class="subtitle is-6">by {% for user in entry.users %}<a href="{{ url_for('frontend.route_participant', participant=user.user_id) }}">{{ user.username }}</a> {% endfor %}</p>
+				</div>
+			</div>
+			<div class="content">
+				{{ entry.description }}
+			</div>
+		</div>
+	</div>
+	<!-- End {{ entry.name }} -->
+	{% endfor %}
+</div>
+{% endblock %}

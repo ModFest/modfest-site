@@ -1,0 +1,32 @@
+{% extends 'event_layout.html' %}
+
+{% block event_content %}
+<h3>Welcome to ModFest 1.15!</h3>
+<p>
+	ModFest 1.15 was a Fabric modding event that ran from <b>March 28th</b> to <b>April 5th</b>.
+</p>
+
+<h3>Requirements:</h3>
+<ul>
+	<li>Minecraft 1.15.2</li>
+	<li>Fabric Loader</li>
+	<li>Mods must be created between March 28th and April 5th</li>
+	<li>Mods are encouraged to use one of the Themes</li>
+</ul>
+<h3>You can work:</h3>
+<ul>
+	<li>Solo (By Yourself)</li>
+	<li>With a Custom Team</li>
+	<li>With a Randomized Team</li>
+</ul>
+<h3>Themes:</h3>
+<ul>
+	<li>Exploration</li>
+	<li>Industry</li>
+	<li>Magic</li>
+</ul>
+<br>
+<p>
+	At the end of ModFest 1.15, {{ event.entry_count }} mods were released.
+</p>
+{% endblock %}
