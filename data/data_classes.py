@@ -79,7 +79,8 @@ class Entry:
 
 
 class Settings:
-    def __init__(self, connect_enabled: bool = True, submissions_enabled: bool = True, edit_entry_enabled: bool = True):
-        self.connect_enabled = connect_enabled
-        self.submissions_enabled = submissions_enabled
-        self.edit_entry_enabled = edit_entry_enabled
+    def __init__(self, connect: bool = True, submissions: bool = True, vote: bool = True, edit_entry: bool = True):
+        self.connect = connect
+        self.submissions = submissions
+        self.vote = vote
+        self.edit_entry = edit_entry

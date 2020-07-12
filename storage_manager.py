@@ -1,10 +1,15 @@
 import sqlite3
-
+import json
 from data.data_classes import *
 
 
 # TODO: Comply with GDPR
 # TODO: add db initialization, init tables etc.
+
+def validate_storage():
+    with sqlite3.connect('storage.db') as con:
+        c = con.cursor()
+
 
 def update_user(user: User):
     with sqlite3.connect('storage.db') as con:
@@ -162,16 +167,11 @@ def get_entries_for_user(user: User) -> List[Entry]:
 
 
 def get_settings() -> Settings:
-    with sqlite3.connect('storage.db') as con:
-        c = con.cursor()
-        sql: str = "SELECT * FROM SETTINGS;"
-        c.execute(sql)
-        r: iter = c.fetchone()
+    with open("globals.json") as json_file:
+        data = json.load(json_file)
+        return Settings(data["connect"], data["submissions"], data["vote"], data["edit_entry"])
 
-        connect: bool = True
-        submissions: bool = True
-        edit_entries: bool = True
 
-        print(r)
-
-        return Settings(connect, submissions, edit_entries)
+def save_settings(settings: Settings):
+    with open("globals.json", "w") as json_file:
+        json.dump(settings, json_file)
