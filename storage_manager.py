@@ -4,11 +4,25 @@ from data.data_classes import *
 
 
 # TODO: Comply with GDPR
-# TODO: add db initialization, init tables etc.
 
 def validate_storage():
     with sqlite3.connect('storage.db') as con:
         c = con.cursor()
+        sql: str = "CREATE TABLE IF NOT EXISTS BADGES (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, icon TEXT NOT NULL);"
+        c.execute(sql)
+        sql = "CREATE TABLE IF NOT EXISTS ENTRIES (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, description TEXT NOT NULL, screenshot TEXT, link TEXT, dependencies TEXT, source TEXT, issues TEXT, event TEXT);"
+        c.execute(sql)
+        sql = "CREATE TABLE IF NOT EXISTS EVENTS (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, start TEXT NOT NULL, end TEXT NOT NULL, state INTEGER NOT NULL DEFAULT 0);"
+        c.execute(sql)
+        sql = "CREATE TABLE IF NOT EXISTS THEMES (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, event TEXT NOT NULL);"
+        c.execute(sql)
+        sql = "CREATE TABLE IF NOT EXISTS USER_BADGES (id INTEGER PRIMARY KEY AUTOINCREMENT, user INTEGER NOT NULL, badge INTEGER NOT NULL);"
+        c.execute(sql)
+        sql = "CREATE TABLE IF NOT EXISTS USER_ENTRIES (id INTEGER PRIMARY KEY AUTOINCREMENT, user INTEGER NOT NULL, entry INTEGER NOT NULL);"
+        c.execute(sql)
+        sql = "CREATE TABLE IF NOT EXISTS USERS (id INTEGER PRIMARY KEY, username TEXT NOT NULL, discriminator TEXT NOT NULL, avatar TEXT NOT NULL, code TEXT, admin INTEGER NOT NULL DEFAULT 0);"
+        c.execute(sql)
+        con.commit()
 
 
 def update_user(user: User):
