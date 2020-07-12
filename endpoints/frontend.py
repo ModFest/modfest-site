@@ -14,7 +14,7 @@ def route_index():
     return redirect(url_for('frontend.route_event', event=e.name))
 
 
-@app.route("/route_link")  # https://modfest.net/link
+@app.route("/link")  # https://modfest.net/link
 def route_link():
     if 'd-id' not in session:
         return redirect(url_for('frontend.route_index'))
@@ -24,7 +24,7 @@ def route_link():
     return str(user.code)
 
 
-@app.route("/route_auth")  # https://modfest.net/auth
+@app.route("/auth")  # https://modfest.net/auth
 def route_auth():
     code = request.args.get("code")
     if code is None:
@@ -51,7 +51,7 @@ def route_auth():
     return redirect(url_for('frontend.route_index'))
 
 
-@app.route("/route_logout")  # https://modfest.net/logout
+@app.route("/logout")  # https://modfest.net/logout
 def route_logout():
     if 'd-id' in session:
         session.clear()
