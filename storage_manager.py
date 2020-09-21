@@ -6,6 +6,7 @@ from data.data_classes import *
 # TODO: Comply with GDPR
 
 def validate_storage():
+    print("Validating storage.")
     with sqlite3.connect('storage.db') as con:
         c = con.cursor()
         sql: str = "CREATE TABLE IF NOT EXISTS BADGES (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, icon TEXT NOT NULL);"
