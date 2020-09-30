@@ -42,7 +42,8 @@ def get_user(token: str):
 
 def log(content: str):
     dat = {
-        content: content
+        "content": content,
+        "username": "ModFest Site Logger"
     }
     heads = {
         "Content-Type": "application/json"

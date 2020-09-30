@@ -1,16 +1,18 @@
 import string
 import random
-from typing import Optional, List
+from typing import List
 
 
 class User:
-    def __init__(self, user_id: int, username: str, discriminator: str, avatar: str, code: str = "", admin: int = 0):
+    def __init__(self, user_id: int, username: str, discriminator: str, avatar: str, code: str = "", admin: int = 0,
+                 pronouns: str = ""):
         self.user_id = user_id
         self.username = username
         self.discriminator = discriminator
         self.avatar = avatar
         self.code = code
         self.admin = admin
+        self.pronouns = pronouns
 
     def update_code(self, clear: bool = False):
         code: str = ""
@@ -18,7 +20,7 @@ class User:
             code = ''.join([random.choice(string.ascii_letters + string.digits) for n in range(6)])
         self.code = code
 
-    def format(self) -> str:
+    def format_name(self) -> str:
         return self.username + "#" + str(self.discriminator)
 
 
@@ -44,10 +46,11 @@ class Event:
 
 
 class Badge:
-    def __init__(self, badge_id: int, name: str, file: str):
+    def __init__(self, badge_id: int, name: str, file: str, role: int):
         self.badge_id = badge_id
         self.name = name
         self.file = file
+        self.role = role
 
 
 class LinkResponse:

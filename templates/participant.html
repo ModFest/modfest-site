@@ -10,7 +10,7 @@
 				</figure>
 			</div>
 			<div class="media-content">
-				<p class="title is-4">{{ user.format() }}</p>
+				<p class="title is-4">{{ user.format_name() }} <span class="title is-6">{{ user.pronouns }}</span></p>
 				<p class="subtitle is-6">{% for badge in badges %}<img src="{{ url_for('static', filename='badges/' + badge.file) }}" alt="{{ badge.name }}" title="{{ badge.name }}" class="badge"> {% endfor %}</p>
 			</div>
 		</div>
@@ -28,7 +28,7 @@
 		<div class="card-content">
 			<div class="media">
 				<div class="media-content">
-					<a href="{{ entry.link}}" target="_blank">
+					<a href="{{ entry.link }}" target="_blank">
 						<p class="title is-4">{{ entry.name }}</p>
 					</a>
 					<p class="subtitle is-6">by {% for user in entry.users %}{{ user.username }} {% endfor %}</p>

@@ -7126,7 +7126,7 @@ label.panel-block {
 
 .mod-card {
   border-radius: 16px;
-  background-color: #141414;
+  background-color: var(--modfest-main-light);
   box-shadow: none; }
 
 .content figure {
@@ -7152,12 +7152,6 @@ label.panel-block {
 
 .is-clickable {
   cursor: pointer;
-}
-
-.profile-card {
-  border-radius: 16px;
-  background-color: #141414;
-  box-shadow: none;
 }
 
 .badge {

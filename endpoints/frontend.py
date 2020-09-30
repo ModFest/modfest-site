@@ -2,7 +2,7 @@ from typing import Optional, List
 
 from flask import Blueprint, request, render_template, session, redirect, url_for
 import storage_manager as storage
-from data.data_classes import User, Event, Entry, Badge, Settings
+from data.data_classes import User, Event, Entry, Badge
 from data import discord
 
 app = Blueprint('frontend', __name__, template_folder='templates')
@@ -46,7 +46,6 @@ def route_auth():
     session['d-discriminator'] = r.json()['discriminator']
     session['d-avatar'] = avatar
     session['d-id'] = r.json()['id']
-
     storage.update_user(User(r.json()['id'], r.json()['username'], r.json()['discriminator'], avatar))
     return redirect(url_for('frontend.route_index'))
 
@@ -58,7 +57,7 @@ def route_logout():
     return redirect(url_for('frontend.route_index'))
 
 
-@app.route("/<string:event>")  # https://modfest.net/1.16
+@app.route("/<path:event>")  # https://modfest.net/1.16
 def route_event(event: str):
     if event == "favicon.ico":
         return url_for('static', filename=storage.get_latest_event().name + '/favicon.ico')
@@ -70,21 +69,8 @@ def route_event(event: str):
     return render_template("events/" + e.name + ".html", event=e)
 
 
-@app.route("/<string:event>/entries")
+@app.route("/<path:event>/entries")
 def route_entries(event: str):
-    e: Optional[Event] = storage.get_event(event)
-    entries: List[Entry] = storage.get_entries(event)
-    if e is not None:
-        return render_template('entries.html', entries=entries, event=e)
-    else:
-        return redirect(url_for('frontend.route_index'))
-
-
-@app.route("/<string:event>/entries/new", methods=["POST", "GET"])
-def route_new_entries(event: str):
-    if request.method == "POST":
-        discord.log("log from site")
-        return {"gamer": "time"}
     e: Optional[Event] = storage.get_event(event)
     entries: List[Entry] = storage.get_entries(event)
     if e is not None:
