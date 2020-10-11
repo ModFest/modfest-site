@@ -1,10 +1,9 @@
-{% extends 'layout.html' %}
+{% extends 'layout_old.html' %}
 
 {% block content %}
 <h3>{% if event.name.startswith("fallfest/") %}FallFest {{ event.name.removeprefix("fallfest/") }}{% else %}ModFest {{ event.name }}{% endif %} Entries</h3>
 <p>
-	{% if event.name.startswith("fallfest/") %}FallFest {{ event.name.removeprefix("fallfest/") }}{% else %}ModFest {{ event.name }}{% endif %} had {{ entries }} total entries.
-	modders.
+	{% if event.name.startswith("fallfest/") %}FallFest {{ event.name.removeprefix("fallfest/") }}{% else %}ModFest {{ event.name }}{% endif %} had {{ len(entries) }} total entries.
 </p>
 <div class="container entries-list">
 	{% for entry in entries %}

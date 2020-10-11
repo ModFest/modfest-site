@@ -1,6 +1,8 @@
 import asyncio
 from typing import List
+from urllib.parse import urlparse
 
+import requests
 from discord.ext import commands
 import discord
 import config
@@ -213,6 +215,46 @@ async def new(ctx):
     def check(m):
         return m.channel == dm and m.author.id == ctx.message.author.id
 
+    def url_check(m):
+        return check(m) and is_url(m.content)
+
+    def img_check(m: discord.Message):
+        return url_check(m) and download_image(m.attachments[0].url, "static/submissions/temp/")
+
+    def is_url(url):
+        try:
+            result = urlparse(url)
+            return all([result.scheme, result.netloc])
+        except ValueError:
+            return False
+
+    def send_request(url):
+        try:
+            page = requests.get(url)
+
+        except Exception:
+            return False
+
+        # check status code
+        if page.status_code != 200:
+            return False
+
+        return page
+
+    def download_image(img_url: str, file_path: str):
+        img = send_request(img_url)
+
+        if not img:
+            return False
+
+        if not img.content[:4] == b'\xff\xd8\xff\xe0':
+            return False
+
+        with open(file_path, "wb") as f:
+            f.write(img.content)
+
+        return True
+
     try:
         await dm.send("What is your mod called?")
         await ctx.message.add_reaction("\u2705")
@@ -226,16 +268,16 @@ async def new(ctx):
         deps: discord.Message = await bot.wait_for("message", check=check, timeout=120)
 
         await dm.send("Enter the link to your mod. (Direct `.jar` file or CurseForge page)")
-        link: discord.Message = await bot.wait_for("message", check=check, timeout=120)
+        link: discord.Message = await bot.wait_for("message", check=url_check, timeout=120)
 
         await dm.send("Enter a link to the source code of your mod.")
-        source: discord.Message = await bot.wait_for("message", check=check, timeout=120)
+        source: discord.Message = await bot.wait_for("message", check=url_check, timeout=120)
 
         await dm.send("Enter a link to your mod's issue tracker.")
-        issues: discord.Message = await bot.wait_for("message", check=check, timeout=120)
+        issues: discord.Message = await bot.wait_for("message", check=url_check, timeout=120)
 
         await dm.send("Upload a screenshot for you mod.")
-        screenshot: discord.Message = await bot.wait_for("message", check=check, timeout=120)
+        screenshot: discord.Message = await bot.wait_for("message", check=img_check, timeout=120)
 
         await dm.send("Enter your team members. \n\"None\" or comma separated list of discord user ids or tags, "
                       "eg: \"719070278050906122, 97172171259904000\" or \"JoeZwet#0001, ModFest#4875\"")
@@ -292,8 +334,7 @@ async def new(ctx):
         await bot.get_channel(758534206628036628).send(embed=e)
         await dm.send(embed=e)
 
-        users: List[User] = []
-        users.append(storage.get_user_by_id_or_default(ctx.message.author.id))
+        users: List[User] = [storage.get_user_by_id_or_default(ctx.message.author.id)]
 
         if team.content.lower() != "none":
             c: str = team.content

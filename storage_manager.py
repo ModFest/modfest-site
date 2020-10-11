@@ -1,15 +1,26 @@
 import sqlite3
 import json
 from typing import Optional
+import psycopg2
+import config
 
 from data.data_classes import *
+
+
+def get_connection():
+    connection = psycopg2.connect(user=config.db_user,
+                                  password=config.db_pass,
+                                  host=config.db_host,
+                                  port=config.db_port,
+                                  database=config.db_name)
+    return connection
 
 
 # TODO: Comply with GDPR
 
 def validate_storage():
     print("Validating storage.")
-    with sqlite3.connect('storage.db') as con:
+    with get_connection() as con:
         c = con.cursor()
         sql: str = "CREATE TABLE IF NOT EXISTS BADGES (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, " \
                    "icon TEXT NOT NULL, role INTEGER NOT NULL);"
@@ -37,7 +48,7 @@ def validate_storage():
 
 
 def update_user(user: User):
-    with sqlite3.connect('storage.db') as con:
+    with get_connection() as con:
         c = con.cursor()
         sql: str = "INSERT INTO USERS VALUES (?, ?, ?, ?, ?, 0, ?);"
         u: Optional[User] = get_user_by_id(user.user_id)
@@ -50,7 +61,7 @@ def update_user(user: User):
 
 
 def get_user_by_id(user_id: int) -> Optional[User]:
-    with sqlite3.connect('storage.db') as con:
+    with get_connection() as con:
         c = con.cursor()
         if user_id is not None:
             sql: str = "SELECT * from USERS where id = ?;"
@@ -71,7 +82,7 @@ def get_user_by_id_or_default(user_id: int) -> User:
 
 
 def get_user_by_code(code: str) -> Optional[User]:
-    with sqlite3.connect('storage.db') as con:
+    with get_connection() as con:
         c = con.cursor()
         if code != "":
             sql: str = "SELECT * from USERS where code = ?;"
@@ -84,7 +95,7 @@ def get_user_by_code(code: str) -> Optional[User]:
 
 
 def get_latest_event() -> Event:
-    with sqlite3.connect('storage.db') as con:
+    with get_connection() as con:
         c = con.cursor()
         sql: str = "SELECT * from EVENTS;"
         c.execute(sql)
@@ -93,7 +104,7 @@ def get_latest_event() -> Event:
 
 
 def get_event(name: str) -> Optional[Event]:
-    with sqlite3.connect('storage.db') as con:
+    with get_connection() as con:
         c = con.cursor()
         if name != "":
             sql: str = "SELECT * from EVENTS where name = ?;"
@@ -106,7 +117,7 @@ def get_event(name: str) -> Optional[Event]:
 
 
 def get_user_badges(user: User) -> List[Badge]:
-    with sqlite3.connect('storage.db') as con:
+    with get_connection() as con:
         c = con.cursor()
         sql: str = "SELECT * FROM USER_BADGES WHERE user = ?;"
         c.execute(sql, (user.user_id,))
@@ -118,7 +129,7 @@ def get_user_badges(user: User) -> List[Badge]:
 
 #  TODO: make this not suck
 def update_user_badges(user: User, badges: List[Badge]) -> List[Badge]:
-    with sqlite3.connect('storage.db') as con:
+    with get_connection() as con:
         c = con.cursor()
         sql: str = "DELETE FROM USER_BADGES WHERE user=?;"
         c.execute(sql, (user.user_id,))
@@ -151,7 +162,7 @@ def remove_badge(user: User, badge: Badge) -> List[Badge]:
 
 
 def create_badge(badge: Badge):
-    with sqlite3.connect('storage.db') as con:
+    with get_connection() as con:
         c = con.cursor()
         sql: str = "INSERT INTO BADGES (name, icon, role) VALUES(?,?,?);"
         c.execute(sql, (badge.name, badge.file, badge.role))
@@ -159,7 +170,7 @@ def create_badge(badge: Badge):
 
 
 def get_badge(badge_id: int) -> Optional[Badge]:
-    with sqlite3.connect('storage.db') as con:
+    with get_connection() as con:
         c = con.cursor()
         sql: str = "SELECT * FROM BADGES WHERE id = ?;"
         c.execute(sql, (badge_id,))
@@ -170,7 +181,7 @@ def get_badge(badge_id: int) -> Optional[Badge]:
 
 
 def get_badge_by_name(badge_name: str) -> Optional[Badge]:
-    with sqlite3.connect('storage.db') as con:
+    with get_connection() as con:
         c = con.cursor()
         sql: str = "SELECT * FROM BADGES WHERE name = ?;"
         c.execute(sql, (badge_name,))
@@ -181,7 +192,7 @@ def get_badge_by_name(badge_name: str) -> Optional[Badge]:
 
 
 def get_users_for_entry(entry: int) -> List[User]:
-    with sqlite3.connect('storage.db') as con:
+    with get_connection() as con:
         c = con.cursor()
         sql: str = "SELECT * FROM USER_ENTRIES WHERE entry = ?;"
         c.execute(sql, (entry,))
@@ -195,7 +206,7 @@ def get_users_for_entry(entry: int) -> List[User]:
 
 
 def get_entry_id_from_name(entry: str) -> Optional[int]:
-    with sqlite3.connect('storage.db') as con:
+    with get_connection() as con:
         c = con.cursor()
         sql: str = "SELECT * FROM ENTRIES WHERE name = ?;"
         c.execute(sql, (entry,))
@@ -206,7 +217,7 @@ def get_entry_id_from_name(entry: str) -> Optional[int]:
 
 
 def get_entry(entry: int) -> Optional[Entry]:
-    with sqlite3.connect('storage.db') as con:
+    with get_connection() as con:
         c = con.cursor()
         sql: str = "SELECT * FROM ENTRIES WHERE id = ?;"
         c.execute(sql, (entry,))
@@ -227,7 +238,7 @@ def get_entry(entry: int) -> Optional[Entry]:
 
 
 def get_entries(event: str) -> List[Entry]:
-    with sqlite3.connect('storage.db') as con:
+    with get_connection() as con:
         c = con.cursor()
         sql: str = "SELECT * FROM ENTRIES WHERE event = ?;"
         c.execute(sql, (event,))
@@ -252,7 +263,7 @@ def get_entries(event: str) -> List[Entry]:
 
 
 def get_entries_for_user(user: User) -> List[Entry]:
-    with sqlite3.connect('storage.db') as con:
+    with get_connection() as con:
         c = con.cursor()
         sql: str = "SELECT entry FROM USER_ENTRIES WHERE user = ?;"
         c.execute(sql, (user.user_id,))
@@ -276,7 +287,7 @@ def save_settings(settings: Settings):
 
 
 def create_event(name, start, end) -> Event:
-    with sqlite3.connect('storage.db') as con:
+    with get_connection() as con:
         c = con.cursor()
         sql: str = "INSERT INTO EVENTS (name, start, end, state) VALUES(?,?,?,0);"
         c.execute(sql, (name, start, end,))
@@ -284,7 +295,7 @@ def create_event(name, start, end) -> Event:
 
 
 def update_badge(badge_id: int, name=None, icon=None, role=None) -> Badge:
-    with sqlite3.connect('storage.db') as con:
+    with get_connection() as con:
         c = con.cursor()
         if name:
             sql: str = f"UPDATE BADGES SET name=? where id=?;"
@@ -304,7 +315,7 @@ def update_badge(badge_id: int, name=None, icon=None, role=None) -> Badge:
 
 
 def update_event(old_name, name=None, start=None, end=None, state=None) -> Event:
-    with sqlite3.connect('storage.db') as con:
+    with get_connection() as con:
         c = con.cursor()
         if name:
             sql: str = f"UPDATE EVENTS SET name=? where name = ?;"
@@ -331,7 +342,7 @@ def update_event(old_name, name=None, start=None, end=None, state=None) -> Event
 
 
 def get_badge_list() -> List[Badge]:
-    with sqlite3.connect('storage.db') as con:
+    with get_connection() as con:
         c = con.cursor()
         sql: str = "SELECT * FROM BADGES;"
         c.execute(sql,)
@@ -347,7 +358,7 @@ def get_badge_list() -> List[Badge]:
 
 
 def create_entry(entry: Entry) -> Entry:
-    with sqlite3.connect('storage.db') as con:
+    with get_connection() as con:
         c = con.cursor()
         sql: str = "INSERT INTO ENTRIES (name, description, screenshot, link, dependencies, " \
                    "source, issues, event) VALUES (?,?,?,?,?,?,?,?);"
@@ -365,7 +376,7 @@ def create_entry(entry: Entry) -> Entry:
 
 
 def delete_entry(entry: int):
-    with sqlite3.connect('storage.db') as con:
+    with get_connection() as con:
         c = con.cursor()
         sql: str = "DELETE FROM ENTRIES where id=?;"
         c.execute(sql, (entry,))

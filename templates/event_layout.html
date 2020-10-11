@@ -1,4 +1,4 @@
-{% extends 'layout.html' %}
+{% extends 'layout_old.html' %}
 
 {% block content %}
 {% block event_content %}{% endblock %}
@@ -12,15 +12,7 @@
         </span>
         <strong>Join our Discord Server</strong>
       </a>
-      {% if event.state == 0  %}
-      <a class="button is-primary is-outlined" href="{{ url_for('frontend.route_entries', event=event.name) }}">
-        <strong>Sign Up!</strong>
-      </a>
-      {% elif event.state == 1 %}
-      <a class="button is-primary is-outlined" href="{{ url_for('frontend.route_entries', event=event.name) }}">
-        <strong>Submit Entry</strong>
-      </a>
-      {% elif event.state == 2 or event.state == 4 %}
+      {% if event.state == 2 or event.state == 4 %}
       <a class="button is-primary is-outlined" href="{{ url_for('frontend.route_entries', event=event.name) }}">
         <strong>View Entries</strong>
       </a>

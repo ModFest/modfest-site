@@ -9,6 +9,8 @@ verify_ssl = true
 flask = "*"
 requests = "*"
 "discord.py" = "*"
+validators = "*"
+psycopg2 = "*"
 
 [requires]
 python_version = "3.8"

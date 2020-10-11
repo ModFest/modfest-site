@@ -11,3 +11,10 @@ discord_webhook: str = ""  # bot webhook url - used for logging
 bot_token: str = ""  # bot bot token
 admin_role: str = ""  # bot admin role
 guild_id: str = ""  # bot guild
+
+# database config
+db_user: str = ""
+db_pass: str = ""
+db_host: str = ""
+db_port: str = ""
+db_name: str = ""
