@@ -1,4 +1,3 @@
-import sqlite3
 import json
 from typing import Optional
 import psycopg2
@@ -22,24 +21,24 @@ def validate_storage():
     print("Validating storage.")
     with get_connection() as con:
         c = con.cursor()
-        sql: str = "CREATE TABLE IF NOT EXISTS BADGES (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, " \
+        sql: str = "CREATE TABLE IF NOT EXISTS BADGES (id SERIAL PRIMARY KEY, name TEXT NOT NULL, " \
                    "icon TEXT NOT NULL, role INTEGER NOT NULL);"
         c.execute(sql)
-        sql = "CREATE TABLE IF NOT EXISTS ENTRIES (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, " \
+        sql = "CREATE TABLE IF NOT EXISTS ENTRIES (id SERIAL PRIMARY KEY, name TEXT NOT NULL, " \
               "description TEXT NOT NULL, screenshot TEXT, link TEXT, dependencies TEXT, source TEXT, " \
               "issues TEXT, event TEXT);"
         c.execute(sql)
-        sql = "CREATE TABLE IF NOT EXISTS EVENTS (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, " \
+        sql = "CREATE TABLE IF NOT EXISTS EVENTS (id SERIAL PRIMARY KEY, name TEXT NOT NULL, " \
               "start TEXT NOT NULL, end TEXT NOT NULL, state INTEGER NOT NULL DEFAULT 0);"
         c.execute(sql)
-        sql = "CREATE TABLE IF NOT EXISTS THEMES (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, " \
+        sql = "CREATE TABLE IF NOT EXISTS THEMES (id SERIAL PRIMARY KEY, name TEXT NOT NULL, " \
               "event TEXT NOT NULL);"
         c.execute(sql)
-        sql = "CREATE TABLE IF NOT EXISTS USER_BADGES (id INTEGER PRIMARY KEY AUTOINCREMENT, " \
-              "user INTEGER NOT NULL, badge INTEGER NOT NULL);"
+        sql = "CREATE TABLE IF NOT EXISTS USER_BADGES (id SERIAL PRIMARY KEY, " \
+              "userId INTEGER NOT NULL, badge INTEGER NOT NULL);"
         c.execute(sql)
-        sql = "CREATE TABLE IF NOT EXISTS USER_ENTRIES (id INTEGER PRIMARY KEY AUTOINCREMENT, " \
-              "user INTEGER NOT NULL, entry INTEGER NOT NULL);"
+        sql = "CREATE TABLE IF NOT EXISTS USER_ENTRIES (id SERIAL PRIMARY KEY, " \
+              "userId INTEGER NOT NULL, entry INTEGER NOT NULL);"
         c.execute(sql)
         sql = "CREATE TABLE IF NOT EXISTS USERS (id INTEGER PRIMARY KEY, username TEXT NOT NULL, " \
               "discriminator TEXT NOT NULL, avatar TEXT NOT NULL, code TEXT, admin INTEGER NOT NULL DEFAULT 0);"
@@ -119,7 +118,7 @@ def get_event(name: str) -> Optional[Event]:
 def get_user_badges(user: User) -> List[Badge]:
     with get_connection() as con:
         c = con.cursor()
-        sql: str = "SELECT * FROM USER_BADGES WHERE user = ?;"
+        sql: str = "SELECT * FROM USER_BADGES WHERE userId = ?;"
         c.execute(sql, (user.user_id,))
         l: List[Badge] = []
         for x in c.fetchall():
@@ -131,11 +130,11 @@ def get_user_badges(user: User) -> List[Badge]:
 def update_user_badges(user: User, badges: List[Badge]) -> List[Badge]:
     with get_connection() as con:
         c = con.cursor()
-        sql: str = "DELETE FROM USER_BADGES WHERE user=?;"
+        sql: str = "DELETE FROM USER_BADGES WHERE userId=?;"
         c.execute(sql, (user.user_id,))
 
         for b in badges:
-            sql: str = "INSERT INTO USER_BADGES (user, badge) VALUES (?,?);"
+            sql: str = "INSERT INTO USER_BADGES (userId, badge) VALUES (?,?);"
             c.execute(sql, (user.user_id, b.badge_id))
 
         con.commit()
@@ -265,7 +264,7 @@ def get_entries(event: str) -> List[Entry]:
 def get_entries_for_user(user: User) -> List[Entry]:
     with get_connection() as con:
         c = con.cursor()
-        sql: str = "SELECT entry FROM USER_ENTRIES WHERE user = ?;"
+        sql: str = "SELECT entry FROM USER_ENTRIES WHERE userId = ?;"
         c.execute(sql, (user.user_id,))
         r: iter = c.fetchall()
 
@@ -280,6 +279,21 @@ def get_settings() -> Settings:
         data = json.load(json_file)
         return Settings(data["connect"], data["submissions"], data["vote"], data["edit_entry"])
 
+
+def set_setting(key, value):
+    with open("globals.json", "w") as json_file:
+        settings: Settings = get_settings()
+
+        if key == "connect":
+            settings.connect = bool(value)
+        elif key == "submissions":
+            settings.submissions = bool(value)
+        elif key == "vote":
+            settings.submissions = bool(value)
+        elif key == "edit_entry":
+            settings.submissions = bool(value)
+
+        json.dump(settings, json_file)
 
 def save_settings(settings: Settings):
     with open("globals.json", "w") as json_file:

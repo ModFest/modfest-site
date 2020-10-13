@@ -43,12 +43,28 @@ async def admin(ctx):
 
 
 @admin.command()
+async def settings(ctx: commands.context, *args):
+    if len(args) == 0:
+        # list all current global settings
+        pass
+    if len(args) >= 1:
+        if args[0] == "submit":
+            if len(args) == 2:
+                if args[1] == "True" or args[0] == "False":
+                    storage.set_setting("submissions", args[1])
+            else:
+                ctx.send("Submissions is currently set to " + str(storage.get_settings().submissions))
+
+
+@admin.command()
 async def stats(ctx: commands.Context, *args):
     if len(args) == 0:
         e: discord.embeds.Embed = discord.embeds.Embed(
             title="ModFest Stats",
             timestamp=datetime.now(),
         )
+        e.add_field(name="Total Entries", value=str(len(storage.get_entries(event=storage.get_latest_event().name))),
+                    inline=True)
         await ctx.send(embed=e)
 
 
@@ -210,6 +226,10 @@ async def delete(ctx, *args):
 
 @submission.command()
 async def new(ctx):
+
+    if not storage.get_settings().submissions:
+        return
+
     dm: discord.DMChannel = await ctx.message.author.create_dm()
 
     def check(m):
@@ -369,3 +389,7 @@ async def profile(ctx, *args):
             u: User = storage.get_user_by_id_or_default(ctx.message.author.id)
             u.pronouns = args[1]
             storage.update_user(u)
+
+
+if __name__ == "__main__":
+    start()
